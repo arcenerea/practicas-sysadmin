@@ -1,52 +1,65 @@
-# Configuración de Servidor Apache en Ubuntu
+Práctica: Compartición de archivos entre dos máquinas virtuales (Windows y Linux)
+Realizado por: Nerea Arce Hernández
 
-Esta práctica consistió en la instalación, configuración y optimización de un servidor web Apache en un sistema Ubuntu 16.04. El objetivo principal fue entender el funcionamiento básico del servidor HTTP Apache, así como aplicar configuraciones esenciales para su correcto funcionamiento.
+Introducción
+En esta práctica configuré la compartición de archivos entre dos máquinas virtuales con sistemas operativos diferentes: Windows y Linux. El objetivo fue configurar correctamente las redes y compartir archivos utilizando métodos específicos para cada sistema operativo.
 
-## 🧱 Objetivos
+Para Windows, usé la compartición avanzada en red NAT. Para Linux, configuré Samba y SSP para compartir archivos. Durante el proceso, se presentaron algunos problemas de configuración y conectividad que resolví.
 
-- Instalar Apache en Ubuntu.
-- Verificar el estado del servicio.
-- Configurar archivos principales (puertos, hosts virtuales).
-- Optimizar el rendimiento básico del servidor.
+1. Configuración de redes en VirtualBox
+Máquinas con Windows
+Configuradas en modo NAT para usar la conexión de red del equipo anfitrión.
 
-## ⚙️ Pasos realizados
+Máquinas con Linux
+Inicialmente con adaptador puente (bridge), pero surgieron problemas de conexión.
 
-### 1. Instalación de Apache
+Finalmente configuradas en modo NAT, lo que solucionó el acceso a internet.
 
-Se instaló Apache mediante el gestor de paquetes `apt`:
+Problema detectado:
+Las máquinas Linux no accedían a internet con el adaptador puente. La solución fue cambiar a modo NAT y renovar la IP con sudo dhclient.
 
-```bash
+2. Compartición de archivos
+En Windows (Compartición avanzada)
+Activé la compartición de archivos e impresoras.
+
+Compartí carpetas con permisos adecuados para acceso desde Linux.
+
+En Linux (Samba)
+Instalé Samba con:
 sudo apt update
-sudo apt install apache2
+sudo apt install samba samba-common-bin
 
-
-### 2. Comprobación del estado del servicio
-
-Para verificar que Apache esté activo y funcionando, usa el siguiente comando:
-
-```bash
-sudo systemctl status apache2
-
-
-###3. Comprobación de funcionamiento en el navegador
-Se accedió al servidor desde el navegador introduciendo la IP local, confirmando que la página de bienvenida de Apache se mostraba correctamente.
-
-###4. Archivos de configuración modificados
-/etc/apache2/apache2.conf: Configuración general del servidor.
-
-/etc/apache2/ports.conf: Para definir los puertos que escucha Apache.
-
-/etc/apache2/sites-available/000-default.conf: Modificado para personalizar el host virtual por defecto.
-
-###5. Reinicio del servicio
-Después de los cambios se reinició Apache para aplicar la configuración:
+Configuré /etc/samba/smb.conf para compartir la carpeta:
 
 bash
-sudo systemctl restart apache2
-🔧 Optimización básica
-Se revisaron parámetros de rendimiento y módulos innecesarios para mejorar la eficiencia del servidor en entornos con recursos limitados.
+Copiar
+Editar
+[Compartida]
+path = /home/usuario/compartida
+available = yes
+valid users = usuario
+read only = no
+browsable = yes
+public = yes
+writable = yes
+Reinicié Samba con:
+sudo systemctl restart smbd
 
-📁 Resultado final
-Servidor Apache funcional y personalizado, ejecutándose correctamente en una máquina virtual con Ubuntu 16.04.
+Acceso desde Windows usando la ruta:
+\\10.0.2.15\Compartida
 
-✍️ Nota: Esta práctica forma parte del conjunto de ejercicios realizados durante mi formación como Administradora de Sistemas.
+Problema detectado:
+Revisar permisos y firewall para evitar bloqueo de conexiones SMB.
+
+3. Compartición entre máquinas Linux (SSP)
+Instalé sshfs:
+sudo apt install sshfs
+
+Monté carpeta remota:
+sshfs usuario@10.0.2.15:/home/arcenerea/carpeta /mnt/carpeta
+
+Para desmontar la carpeta:
+fusermount -u /mnt/carpeta
+
+Conclusión
+La práctica permitió entender cómo funcionan diferentes protocolos y configuraciones para compartir archivos entre sistemas heterogéneos. Se resolvieron problemas típicos de redes virtuales y permisos, reforzando el conocimiento en administración básica de sistemas.
