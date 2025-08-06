@@ -19,22 +19,26 @@ Se instaló Apache mediante el gestor de paquetes `apt`:
 sudo apt update
 sudo apt install apache2
 
-2. Comprobación del estado del servicio
-Se verificó que el servicio estuviera activo:
 
-bash
+### 2. Comprobación del estado del servicio
+
+Para verificar que Apache esté activo y funcionando, usa el siguiente comando:
+
+```bash
 sudo systemctl status apache2
-3. Comprobación de funcionamiento en el navegador
+
+
+###3. Comprobación de funcionamiento en el navegador
 Se accedió al servidor desde el navegador introduciendo la IP local, confirmando que la página de bienvenida de Apache se mostraba correctamente.
 
-4. Archivos de configuración modificados
+###4. Archivos de configuración modificados
 /etc/apache2/apache2.conf: Configuración general del servidor.
 
 /etc/apache2/ports.conf: Para definir los puertos que escucha Apache.
 
 /etc/apache2/sites-available/000-default.conf: Modificado para personalizar el host virtual por defecto.
 
-5. Reinicio del servicio
+###5. Reinicio del servicio
 Después de los cambios se reinició Apache para aplicar la configuración:
 
 bash
